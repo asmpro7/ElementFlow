@@ -1,0 +1,12 @@
+{
+    "ID": "78c1bfc7-044e-46cd-b920-9e0ae0e7f234",
+    "ActionKeyword": "ce",
+    "Name": "ElementFlow",
+    "Description": "Data for all Chemical Elements",
+    "Author": "Ahmed ElSaeed",
+    "Version": "1.0.0",
+    "Language": "python",
+    "Website": "https://github.com/asmpro7/ElementFlow",
+    "IcoPath": "Images\\app.png",
+    "ExecuteFileName": "main.py"
+}
