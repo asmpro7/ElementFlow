@@ -1,2 +1,2 @@
 flowlauncher
-Pillow
+Pillow==9.5.0
