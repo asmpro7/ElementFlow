@@ -10,18 +10,17 @@ from flowlauncher import FlowLauncher, FlowLauncherAPI
 import json
 import subprocess
 import os
-from PIL import Image
-
-def image(color_hex):
-    color = tuple(int(color_hex[i:i+2], 16) for i in (0, 2, 4))
-    width, height = 200, 200
+import numpy as np
+import imageio
+def image(color_hex, width=200, height=200):
+    color_rgb = tuple(int(color_hex[i:i + 2], 16) for i in (0, 2, 4))
+    image_data = np.full((height, width, 3), color_rgb, dtype=np.uint8)
     file_name = f"{color_hex}.png"
     dir_name = "colors"
     if not os.path.exists(dir_name):
         os.makedirs(dir_name)
     file_path = os.path.join(dir_name, file_name)
-    image = Image.new('RGB', (width, height), color)
-    image.save(file_path, "PNG")
+    imageio.imsave(file_path, image_data)
 
 def copy2clip(txt):
     txt=str(txt)
