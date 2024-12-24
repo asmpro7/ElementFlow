@@ -1,0 +1,82 @@
+#!/usr/bin/env python
+
+import array
+
+import png
+
+Description = """Enlarge images by an integer factor horizontally and vertically."""
+
+
+def rescale(inp, out, xf, yf):
+    while True:
+        r = png.Reader(file=inp)
+        try:
+            r.preamble()
+        except EOFError:
+            return
+
+        rescale_1(out, r, xf, yf)
+
+
+def rescale_1(out, im, xf, yf):
+    """Rescale a single PNG image, im,
+    and write it to the output stream out.
+    `xf` and `yf` give the x factor and y factor.
+    """
+
+    _, _, pixels, info = im.asDirect()
+
+    typecode = "BH"[info["bitdepth"] > 8]
+    planes = info["planes"]
+
+    resize(info, xf, yf)
+
+    # Values per row, target row.
+    vpr = info["size"][0] * planes
+
+    def iterscale():
+        for row in pixels:
+            bigrow = array.array(typecode, [0] * vpr)
+            row = array.array(typecode, row)
+            for c in range(planes):
+                channel = row[c::planes]
+                for i in range(xf):
+                    bigrow[i * planes + c :: xf * planes] = channel
+            for _ in range(yf):
+                yield bigrow
+
+    w = png.Writer(**info)
+    w.write(out, iterscale())
+
+
+def resize(d, xf, yf):
+    """Edit the "size" member of the dict d, scaling it by `xf` an `yf`."""
+
+    x, y = d["size"]
+    x *= xf
+    y *= yf
+    d["size"] = (x, y)
+
+
+def main(argv=None):
+    import argparse
+    import sys
+
+    if argv is None:
+        argv = sys.argv
+
+    parser = argparse.ArgumentParser(description=Description)
+    parser.add_argument("--xfactor", type=int, default=2)
+    parser.add_argument("--yfactor", type=int, default=2)
+    parser.add_argument("--factor", type=int)
+    parser.add_argument("PNG", type=png.cli_open, nargs="?", default="-")
+    args = parser.parse_args()
+
+    if args.factor:
+        args.xfactor = args.yfactor = args.factor
+
+    return rescale(args.PNG, png.binary_stdout(), args.xfactor, args.yfactor)
+
+
+if __name__ == "__main__":
+    main()
