@@ -10,17 +10,26 @@ from flowlauncher import FlowLauncher, FlowLauncherAPI
 import json
 import subprocess
 import os
-import numpy as np
-import imageio
+import pypng.png as png
 def image(color_hex, width=200, height=200):
-    color_rgb = tuple(int(color_hex[i:i + 2], 16) for i in (0, 2, 4))
-    image_data = np.full((height, width, 3), color_rgb, dtype=np.uint8)
+    writer = png.Writer(width=width, height=height, bitdepth=8, greyscale=False, compression=9)
+    image_data = []
+    color_rgb = bytes.fromhex(color_hex)
+    
+    for _ in range(height):
+        row = color_rgb * width
+        image_data.append(row)
+    
     file_name = f"{color_hex}.png"
     dir_name = "colors"
+    
     if not os.path.exists(dir_name):
         os.makedirs(dir_name)
+    
     file_path = os.path.join(dir_name, file_name)
-    imageio.imsave(file_path, image_data)
+    
+    with open(file_path, "wb") as file:
+        writer.write(file, image_data)
 
 def copy2clip(txt):
     txt=str(txt)
