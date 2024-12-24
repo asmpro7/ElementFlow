@@ -1,0 +1,70 @@
+#!/usr/bin/env python
+
+import argparse
+
+import png
+import prix
+
+# pipwindow
+
+"""Tool to crop/expand an image to a rectangular window.
+Come the revolution
+this tool will allow the image and the window to be placed arbitrarily
+(in particular the window can be bigger than the picture
+and/or overlap it only partially) and
+the image can be OpenGL style # border/repeat effects
+(repeat, mirrored repeat, clamp,
+fixed background colour, background colour from source file).
+For now this tool only crops.
+The window must be no greater than the image in
+both x and y.
+Coordinates are with (0,0) being the top-left
+(as in ImageMagick).
+"""
+
+
+def copy_window(tl, br, inp, out):
+    """Window the *inp* image and copy it to *out*.
+    The window is an axis aligned rectangle with opposite corners
+    at *tl* and *br* (each being an (x,y) pair).
+    *inp* is the input file (a PNG image).
+    *out* is the output file.
+    """
+
+    r = png.Reader(file=inp)
+    _, _, rows, info = r.asDirect()
+
+    image = png.Image(rows, info)
+    image = prix.window(image, tl, br)
+
+    image.write(out)
+
+
+def main(argv=None):
+    import sys
+
+    if argv is None:
+        argv = sys.argv
+    argv = argv[1:]
+
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--top", type=int)
+    parser.add_argument("--left", type=int)
+    parser.add_argument("--bottom", type=int)
+    parser.add_argument("--right", type=int)
+    parser.add_argument(
+        "input", nargs="?", default="-", type=png.cli_open, metavar="PNG"
+    )
+
+    args = parser.parse_args(argv)
+
+    return copy_window(
+        (args.left, args.top),
+        (args.right, args.bottom),
+        args.input,
+        png.binary_stdout(),
+    )
+
+
+if __name__ == "__main__":
+    main()
