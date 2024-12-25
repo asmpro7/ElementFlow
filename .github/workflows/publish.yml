@@ -6,7 +6,14 @@ on:
     branches: [ main ]
     paths-ignore:
       - .github/workflows/*
-
+      
+permissions:
+  contents: read
+  packages: write
+  issues: write
+  pull-requests: write
+  deployments: write
+  
 jobs:
   publish:
     runs-on: ubuntu-latest
