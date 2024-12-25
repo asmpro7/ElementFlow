@@ -10,7 +10,7 @@ from flowlauncher import FlowLauncher, FlowLauncherAPI
 import json
 import subprocess
 import os
-import pypng.png as png
+import png
 def image(color_hex, width=200, height=200):
     writer = png.Writer(width=width, height=height, bitdepth=8, greyscale=False, compression=9)
     image_data = []
