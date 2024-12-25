@@ -1,3 +1,2 @@
 flowlauncher
-numpy
-imageio
+pypng
